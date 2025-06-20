@@ -1,0 +1,359 @@
+Use Vim's omnifunc completion: >
+    <C-x><C-o>		Trigger snippet completion
+*bkmr.txt*	For Vim version 8.0+	Last change: 2025 Jun 20
+
+                    BKMR.VIM - SNIPPET MANAGER INTEGRATION
+
+Author:  sysid
+License: MIT
+Version: 1.0.0
+
+==============================================================================
+CONTENTS						*bkmr-contents*
+
+1. Introduction		|bkmr-introduction|
+2. Requirements		|bkmr-requirements|
+3. Installation		|bkmr-installation|
+4. Configuration	|bkmr-configuration|
+5. Usage		|bkmr-usage|
+6. Commands		|bkmr-commands|
+7. Functions		|bkmr-functions|
+8. Mappings		|bkmr-mappings|
+9. Troubleshooting	|bkmr-troubleshooting|
+10. About		|bkmr-about|
+
+==============================================================================
+1. INTRODUCTION						*bkmr-introduction*
+
+bkmr.vim provides direct integration with the bkmr knowledge manager, allowing
+you to access your snippets directly within Vim without requiring LSP server
+infrastructure.
+
+Key features:
+- Trigger-based completion with `:` character
+- Smart context detection
+- Intelligent caching for performance
+- Interactive snippet search
+- Direct bkmr command integration
+
+==============================================================================
+2. REQUIREMENTS						*bkmr-requirements*
+
+- Vim 8.0+ or Neovim
+- bkmr command-line tool (version 4.24.0+ recommended)
+- JSON parsing support (built-in in modern Vim/Neovim)
+
+Install bkmr: >
+    cargo install bkmr
+    brew install bkmr
+<
+
+Verify installation: >
+    bkmr --version
+    bkmr search -t _snip_ --limit 5
+<
+
+==============================================================================
+3. INSTALLATION						*bkmr-installation*
+
+Using vim-plug: >
+    Plug 'sysid/bkmr-vim.vim'
+<
+
+Using Vundle: >
+    Plugin 'sysid/bkmr-vim.vim'
+<
+
+Manual installation:
+1. Download the plugin files
+2. Copy plugin/bkmr.vim to ~/.vim/plugin/
+3. Copy doc/bkmr.txt to ~/.vim/doc/
+4. Run |:helptags| ~/.vim/doc/
+
+==============================================================================
+4. CONFIGURATION					*bkmr-configuration*
+
+						*g:bkmr_enabled*
+g:bkmr_enabled
+	Enable or disable the plugin.
+	Default: 1
+
+						*g:bkmr_binary*
+g:bkmr_binary
+	Path to the bkmr binary.
+	Default: 'bkmr'
+
+						*g:bkmr_trigger_char*
+g:bkmr_trigger_char
+	Character that triggers snippet completion.
+	Default: ':'
+
+						*g:bkmr_max_completions*
+g:bkmr_max_completions
+	Maximum number of completion items to show.
+	Default: 50
+
+						*g:bkmr_debug*
+g:bkmr_debug
+	Enable debug messages.
+	Default: 0
+
+						*g:bkmr_no_default_mappings*
+g:bkmr_no_default_mappings
+	Disable default key mappings.
+	Default: not set (mappings enabled)
+
+Example configuration: >
+    let g:bkmr_enabled = 1
+    let g:bkmr_binary = '/usr/local/bin/bkmr'
+    let g:bkmr_trigger_char = ';'
+    let g:bkmr_max_completions = 100
+    let g:bkmr_debug = 1
+<
+
+==============================================================================
+5. USAGE						*bkmr-usage*
+
+BASIC COMPLETION					*bkmr-completion*
+
+Type the trigger character (default `:`) followed by letters to trigger
+snippet completion: >
+    :aws<C-x><C-o>		Show AWS-related snippets
+    :hello<C-x><C-o>	Show snippets matching "hello"
+    :js<C-x><C-o>		Show JavaScript snippets
+<
+
+The plugin only triggers in appropriate contexts, avoiding interference with:
+- URLs (http:, https:)
+- Time formats (12:30)
+- Windows paths (C:\)
+
+MANUAL COMPLETION					*bkmr-manual*
+
+Use Vim's omnifunc completion: >
+    <C-x><C-o>		Trigger snippet completion
+<
+
+CONTEXT DETECTION					*bkmr-context*
+
+The plugin intelligently detects when you're typing a snippet trigger vs.
+other uses of the trigger character. It looks for:
+
+Valid contexts: >
+    :hello		✓ Triggers completion
+    :aws		✓ Triggers completion
+    function :test	✓ Triggers completion (space before)
+<
+
+Invalid contexts: >
+    http://example.com	✗ URL, no completion
+    12:30 meeting		✗ Time, no completion
+    user@host:path		✗ After alphanumeric, no completion
+<
+
+==============================================================================
+6. COMMANDS						*bkmr-commands*
+
+						*:BkmrStatus*
+:BkmrStatus
+	Show plugin status, configuration, and health check.
+	Displays:
+	- Plugin enabled/disabled status
+	- bkmr binary path and availability
+	- Trigger character
+	- Cache statistics
+	- Maximum completions setting
+
+						*:BkmrSearch*
+:BkmrSearch
+	Interactive snippet search and insertion.
+	Prompts for search query, displays matching snippets,
+	and allows selection for insertion at cursor.
+
+						*:BkmrClearCache*
+:BkmrClearCache
+	Clear the internal snippet cache.
+	Forces fresh queries to bkmr on next completion.
+
+						*:BkmrOpen*
+:BkmrOpen {id}
+	Open snippet with given ID in external application.
+	Uses bkmr's open command to launch the snippet URL.
+
+Examples: >
+    :BkmrStatus
+    :BkmrSearch
+    :BkmrClearCache
+    :BkmrOpen 123
+<
+
+==============================================================================
+7. FUNCTIONS						*bkmr-functions*
+
+						*bkmr#complete()*
+bkmr#complete({findstart}, {base})
+	Main completion function used as 'omnifunc'.
+	Handles both findstart phase and completion generation.
+
+						*bkmr#trigger_completion()*
+bkmr#trigger_completion()
+	Smart trigger function that returns appropriate action:
+	- Trigger character if not in snippet context
+	- Completion trigger if in snippet context
+
+						*bkmr#open_snippet()*
+bkmr#open_snippet({id})
+	Open snippet by ID using bkmr open command.
+
+						*bkmr#clear_cache()*
+bkmr#clear_cache()
+	Clear internal snippet cache.
+
+						*bkmr#status()*
+bkmr#status()
+	Display plugin status and configuration.
+
+						*bkmr#search_snippets()*
+bkmr#search_snippets()
+	Interactive snippet search interface.
+
+==============================================================================
+8. MAPPINGS						*bkmr-mappings*
+
+DEFAULT MAPPINGS					*bkmr-default-mappings*
+
+Insert mode:
+	<C-x><C-o>	Manual snippet completion (omnifunc)
+
+Normal mode:
+	<leader>bs	Search snippets
+	<leader>bc	Clear cache
+	<leader>bst	Show status
+
+CUSTOM MAPPINGS						*bkmr-custom-mappings*
+
+Disable default mappings: >
+    let g:bkmr_no_default_mappings = 1
+<
+
+Create custom mappings: >
+    " Custom trigger character
+    inoremap <expr> ; bkmr#trigger_completion()
+
+    " Custom manual completion
+    inoremap <C-s> <C-x><C-o>
+
+    " Custom search
+    nnoremap <F2> :BkmrSearch<CR>
+
+    " Quick status
+    nnoremap <leader>? :BkmrStatus<CR>
+<
+
+==============================================================================
+9. TROUBLESHOOTING					*bkmr-troubleshooting*
+
+NO COMPLETIONS APPEARING				*bkmr-no-completions*
+
+1. Check plugin status: >
+    :BkmrStatus
+<
+
+2. Verify bkmr is working: >
+    :!bkmr search -t _snip_ --limit 5
+<
+
+3. Enable debug mode: >
+    let g:bkmr_debug = 1
+<
+
+4. Check omnifunc setting: >
+    :set omnifunc?
+<
+
+5. Test manual completion: >
+    :call bkmr#complete(0, 'test')
+<
+
+PERFORMANCE ISSUES					*bkmr-performance*
+
+1. Reduce completion limit: >
+    let g:bkmr_max_completions = 20
+<
+
+2. Clear cache: >
+    :BkmrClearCache
+<
+
+3. Check bkmr database size: >
+    :!bkmr stats
+<
+
+CONTEXT DETECTION PROBLEMS				*bkmr-context-problems*
+
+The plugin may be too restrictive or permissive in detecting snippet
+contexts. Common issues:
+
+- Completion doesn't trigger when expected
+- Completion triggers in wrong contexts
+
+You can modify the context detection by editing the
+`s:extract_snippet_query()` function in the plugin file.
+
+CACHE ISSUES						*bkmr-cache-issues*
+
+If you're seeing stale results:
+
+1. Clear cache: >
+    :BkmrClearCache
+<
+
+2. Check cache timeout (5 minutes by default)
+3. Restart Vim to reset all state
+
+ERROR MESSAGES						*bkmr-error-messages*
+
+"bkmr binary not found"
+	Install bkmr or set correct path with |g:bkmr_binary|
+
+"Failed to parse bkmr output"
+	Check bkmr version (4.24.0+ recommended)
+	Enable debug mode to see raw output
+
+"bkmr command failed"
+	Check bkmr configuration and snippet database
+
+==============================================================================
+10. ABOUT						*bkmr-about*
+
+bkmr.vim was created to provide direct integration with the bkmr snippet
+manager without requiring LSP server infrastructure, making it suitable for
+simple Vim setups where multiple LSP servers cannot run simultaneously.
+
+RELATED PROJECTS					*bkmr-related*
+
+- bkmr: The snippet manager (https://github.com/sysid/bkmr)
+- bkmr-lsp: LSP server version (https://github.com/sysid/bkmr-lsp)
+- vim-bkmr-lsp: Minimal LSP client (https://github.com/sysid/vim-bkmr-lsp)
+
+COMPARISON WITH LSP VERSION				*bkmr-vs-lsp*
+
+bkmr.vim vs bkmr-lsp:
++ Simple setup, no LSP infrastructure required
++ Can run alongside other Vim plugins
++ Direct bkmr integration
++ Vim-native completion
+- Vim-specific (not universal like LSP)
+- Manual cache management
+
+LICENSE							*bkmr-license*
+
+MIT License - see LICENSE file for details.
+
+CONTRIBUTING						*bkmr-contributing*
+
+Issues and pull requests welcome at:
+https://github.com/sysid/bkmr.vim
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:

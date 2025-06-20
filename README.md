@@ -1,16 +1,15 @@
 # bkmr.vim
 
-A Vim plugin that provides direct integration with [bkmr](https://github.com/sysid/bkmr) snippet manager without requiring LSP server infrastructure.
+A Vim plugin that provides direct integration with snippet part of [bkmr](https://github.com/sysid/bkmr) without requiring LSP server infrastructure.
 
 ## Features
 
 - **Trigger-based completion**: Type `:` followed by letters to get snippet completions
-- **Manual completion**: Use `<C-x><C-o>` or `<C-x><C-b>` for manual snippet completion
+- **Manual completion**: Use `<C-x><C-o>` for omnifunc completion
 - **Smart context detection**: Only triggers in appropriate contexts (not URLs, times, etc.)
 - **Caching**: Intelligent caching with 5-minute timeout for better performance
 - **Snippet interpolation**: Uses bkmr's `--interpolate` flag for processed snippets
 - **Search interface**: Interactive snippet search and insertion
-- **Commands**: Various utility commands for managing snippets
 
 ## Requirements
 
@@ -23,13 +22,13 @@ A Vim plugin that provides direct integration with [bkmr](https://github.com/sys
 ### Using vim-plug
 
 ```vim
-Plug 'sysid/bkmr.vim'
+Plug 'sysid/bkmr-vim'
 ```
 
 ### Using Vundle
 
 ```vim
-Plugin 'sysid/bkmr.vim'
+Plugin 'sysid/bkmr-vim'
 ```
 
 ### Manual Installation
@@ -44,15 +43,17 @@ git clone https://github.com/sysid/bkmr.vim ~/.vim/pack/plugins/start/bkmr.vim
 
 1. **Trigger completion**: Type `:` followed by letters, e.g., `:hello`, `:aws`, `:js`
 2. **Manual completion**: Press `<C-x><C-o>` in insert mode
-3. **Alternative manual**: Press `<C-x><C-b>` in insert mode
 
 ### Examples
 
 ```
-:aws<TAB>           → Shows AWS-related snippets
-:hello<TAB>         → Shows snippets matching "hello"
-:snip:js<TAB>       → Shows JavaScript snippets
+:aws<C-x><C-o>           → Shows AWS-related snippets
+:hello<C-x><C-o>         → Shows snippets matching "hello"
+:js<C-x><C-o>            → Shows JavaScript snippets
+:test<C-x><C-o>          → Shows test-related snippets
 ```
+
+**Note**: The trigger is simply `:` followed by letters. Complex patterns like `:snip:js` are not supported - use simpler queries like `:js` instead.
 
 ### Commands
 
@@ -68,7 +69,7 @@ git clone https://github.com/sysid/bkmr.vim ~/.vim/pack/plugins/start/bkmr.vim
 | Mode | Key | Action |
 |------|-----|--------|
 | Insert | `:` | Trigger completion (context-aware) |
-| Insert | `<C-x><C-b>` | Manual snippet completion |
+| Insert | `<C-x><C-o>` | Manual snippet completion |
 | Normal | `<leader>bs` | Search snippets |
 | Normal | `<leader>bc` | Clear cache |
 | Normal | `<leader>bst` | Show status |
@@ -157,17 +158,6 @@ The plugin skips completion in these contexts:
 
 If it's too restrictive, modify the `s:extract_snippet_query()` function.
 
-## Comparison with LSP Version
-
-| Feature | bkmr.vim | bkmr-lsp |
-|---------|----------|----------|
-| Setup complexity | Simple | Complex |
-| Parallel operation | ✅ | ❌ (vim limitation) |
-| Real-time updates | ✅ | ✅ |
-| Editor integration | Vim-native | Universal LSP |
-| Performance | Direct calls | LSP overhead |
-| Caching | Built-in | Server-side |
-
 ## Development
 
 ### Testing
@@ -180,13 +170,6 @@ vim -c ":BkmrStatus"
 vim -c ":call bkmr#complete(0, 'test')"
 ```
 
-### Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Test with your bkmr setup
-4. Submit a pull request
-
 ## Related Projects
 
 - [bkmr](https://github.com/sysid/bkmr) - The snippet manager this plugin integrates with
@@ -196,4 +179,3 @@ vim -c ":call bkmr#complete(0, 'test')"
 ## License
 
 MIT License - see LICENSE file for details.
-# bkmr-vim
