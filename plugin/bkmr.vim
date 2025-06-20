@@ -1,7 +1,7 @@
 " plugin/bkmr.vim
 " bkmr.vim: Direct bkmr snippet integration for vim
 " Author: sysid
-" Version: 1.0.0
+" Version: 1.0.1
 " License: MIT
 
 if exists('g:loaded_bkmr') || &compatible
